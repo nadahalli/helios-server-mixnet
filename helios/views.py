@@ -1224,9 +1224,9 @@ def voters_list_pretty(request, election):
   eligibility_category_id = None
 
   try:
-    if admin_p and can_list_categories(settings.AUTH_DEFAULT_AUTH_SYSTEM):
-      categories = AUTH_SYSTEMS[settings.AUTH_DEFAULT_AUTH_SYSTEM].list_categories(user)
-      eligibility_category_id = election.eligibility_category_id(settings.AUTH_DEFAULT_AUTH_SYSTEM)
+    if admin_p and can_list_categories(user.user_type):
+      categories = AUTH_SYSTEMS[user.user_type].list_categories(user)
+      eligibility_category_id = election.eligibility_category_id(user.user_type)
   except AuthenticationExpired:
     return user_reauth(request, user)
 
@@ -1286,8 +1286,8 @@ def voters_eligibility(request, election):
     # now process the constraint
     category_id = request.POST['category_id']
 
-    constraint = AUTH_SYSTEMS[settings.AUTH_DEFAULT_AUTH_SYSTEM].generate_constraint(category_id, user)
-    election.eligibility = [{'auth_system': settings.AUTH_DEFAULT_AUTH_SYSTEM, 'constraint': [constraint]}]
+    constraint = AUTH_SYSTEMS[user.user_type].generate_constraint(category_id, user)
+    election.eligibility = [{'auth_system': user.user_type, 'constraint': [constraint]}]
   else:
     election.eligibility = None
 
